@@ -1,7 +1,7 @@
 {
   "plugins": {
     "fzf-lua": {
-      "rev": "ec3fe3d9587005a995a00d55ea424bfc924eaf3e",
+      "rev": "d2fa4fcebe47c49f0393363c7bb2968ba5516cef",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "nvim-highlight-colors": {
