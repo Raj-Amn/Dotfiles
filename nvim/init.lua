@@ -5,7 +5,8 @@ vim.pack.add {
     'https://github.com/y9san9/y9nika.nvim',
     'https://github.com/wakatime/vim-wakatime',
     'https://github.com/brenoprata10/nvim-highlight-colors',
-    'https://github.com/ibhagwan/fzf-lua'
+    'https://github.com/L3MON4D3/LuaSnip',
+    'https://github.com/honza/vim-snippets',
 }
 
 vim.cmd.packadd('cfilter')
@@ -52,7 +53,6 @@ require('oil').setup {
     delete_to_trash = true,
     skip_confirm_for_simple_edits = true,
 }
-require('fzf-lua').setup{}
 
 -- Keymaps
 
@@ -67,11 +67,6 @@ vim.keymap.set('n', '<C-j>', function() vim.cmd('silent! 2argument') end)
 vim.keymap.set('n', '<C-k>', function() vim.cmd('silent! 3argument') end)
 vim.keymap.set('n', '<C-n>', function() vim.cmd('silent! 4argument') end)
 vim.keymap.set('n', '<C-m>', function() vim.cmd('silent! 5argument') end)
-
-local fzf = require('fzf-lua')
-vim.keymap.set('n', '<leader>f', fzf.files, { desc = 'Find files' })
-vim.keymap.set('n', '<leader>g', fzf.live_grep, { desc = 'Live grep' })
-vim.keymap.set('n', '<leader>h', fzf.help_tags, { desc = 'Help tags' })
 
 -- Autocommands
 
@@ -95,17 +90,29 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     callback = function() vim.highlight.on_yank() end,
 })
 
--- Neovide
+-- LuaSnip 
 
-if vim.g.neovide then
-	vim.g.neovide_scale_factor = 1.0
-	vim.o.guifont = "Iosevka"
+local ls = require("luasnip")
+ls.config.set_config({
+    history = true,
+    updateevents = "TextChanged,TextChangedI",
+})
 
-	vim.keymap.set({ 'n', 'v' }, '<D-c>', '"+y')
-	vim.keymap.set({ 'n', 'v' }, '<D-v>', '"+p')
-	vim.keymap.set('i', '<D-v>', '<C-r>+')
+require("luasnip.loaders.from_snipmate").lazy_load()
+require("luasnip.loaders.from_lua").load({paths = "~/.config/nvim/snippets"})
 
-	vim.keymap.set('n', '<D-=>', function() vim.g.neovide_scale_factor = vim.g.neovide_scale_factor * 1.1 end)
-	vim.keymap.set('n', '<D-->', function() vim.g.neovide_scale_factor = vim.g.neovide_scale_factor / 1.1 end)
-	vim.keymap.set('n', '<D-0>', function() vim.g.neovide_scale_factor = 1.0 end)
-end
+vim.keymap.set({"i", "s"}, "<Tab>", function()
+    if ls.expand_or_jumpable() then
+        ls.expand_or_jump()
+    else
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Tab>", true, false, true), "n", false)
+    end
+end, {silent = true})
+
+vim.keymap.set({"i", "s"}, "<S-Tab>", function()
+    if ls.jumpable(-1) then
+        ls.jump(-1)
+    else
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<S-Tab>", true, false, true), "n", false)
+    end
+end, {silent = true})
